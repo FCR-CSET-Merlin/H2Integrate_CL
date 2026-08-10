@@ -6,6 +6,12 @@ energy-system analysis in Chile.
 ## Development rules
 
 - Never commit directly to main or develop.
+- Record every repository modification in `REGISTRO_ACTIVIDAD.md` using the
+  `America/Santiago` timezone. Include the files changed, purpose, relevant
+  assumptions, verification performed, result, status, and responsible agent.
+- Update `REGISTRO_ACTIVIDAD.md` as part of the same change being documented.
+- Read-only inspections do not require a log entry unless they produce a
+  decision or finding that materially affects the project.
 - Preserve compatibility with upstream H2Integrate whenever possible.
 - Do not modify public interfaces without documenting the reason.
 - Keep Chile-specific assumptions configurable.

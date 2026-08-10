@@ -687,3 +687,24 @@ YAML principal
 Así, el fork mantendrá compatibilidad con la librería original y añadirá capacidades
 específicas para estudiar sistemas energéticos en Chile mediante extensiones modulares,
 trazables y verificables.
+
+## 13. Registro de actividad y trazabilidad
+
+Toda modificación realizada en el repositorio debe registrarse en
+`REGISTRO_ACTIVIDAD.md` como parte del mismo cambio. Este archivo constituye el registro
+cronológico de la adaptación y debe actualizarse sin reemplazar ni eliminar entradas
+anteriores.
+
+Cada entrada debe indicar, como mínimo:
+
+- Fecha y hora en la zona horaria `America/Santiago`.
+- Resumen y propósito de la actividad.
+- Archivos modificados.
+- Supuestos o decisiones relevantes.
+- Pruebas o verificaciones ejecutadas y su resultado.
+- Estado de la actividad.
+- Agente o persona responsable.
+
+Las inspecciones de solo lectura no requieren una entrada, salvo que produzcan una decisión
+o un hallazgo que afecte materialmente al proyecto. El registro no debe contener
+credenciales, información sensible, datasets descargados ni resultados voluminosos.
