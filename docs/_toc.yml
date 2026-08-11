@@ -58,6 +58,7 @@ parts:
     chapters:
       - file: resource/resource_index
         sections:
+          - file: resource/era5_single_levels_contract
           - file: resource/wind_index
           - file: resource/wind_toolkit_v2_api
           - file: resource/openmeteo_wind_archive
