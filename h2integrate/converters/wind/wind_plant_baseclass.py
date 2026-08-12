@@ -1,3 +1,5 @@
+import warnings
+
 from h2integrate.core.model_baseclasses import PerformanceModelBaseClass
 
 
@@ -33,6 +35,8 @@ class WindPerformanceBaseClass(PerformanceModelBaseClass):
         Note:
             This function assumes resource heights are integers. This function also assumes
             that all variables in ``resource_vars`` have the same resource heights.
+            If the hub height exceeds the maximum available resource height, that maximum
+            is returned with a warning and no vertical extrapolation is applied.
 
         Args:
             hub_height_meters (int | float): turbine hub-height in meters
@@ -44,6 +48,9 @@ class WindPerformanceBaseClass(PerformanceModelBaseClass):
         Returns:
             list[int]: list of resource heights in meters that most closely bound
                 the turbine hub-height.
+
+        Raises:
+            ValueError: If no resource heights exist for the requested variables.
         """
         heights_per_parameter = {}
         allowed_hub_height_meters = set()
@@ -58,6 +65,25 @@ class WindPerformanceBaseClass(PerformanceModelBaseClass):
             if len(params_heights) > 0:
                 heights_per_parameter.update({param: params_heights})
                 allowed_hub_height_meters.update(params_heights)
+
+        if not allowed_hub_height_meters:
+            raise ValueError(
+                "No wind resource heights were found for variables "
+                f"{resource_vars}."
+            )
+
+        maximum_resource_height = max(allowed_hub_height_meters)
+        if float(hub_height_meters) > float(maximum_resource_height):
+            warnings.warn(
+                (
+                    f"Requested hub height {float(hub_height_meters):g} m exceeds the "
+                    f"maximum available wind resource height {maximum_resource_height:g} m; "
+                    f"using {maximum_resource_height:g} m without vertical extrapolation."
+                ),
+                UserWarning,
+                stacklevel=2,
+            )
+            return [int(maximum_resource_height)]
 
         # Check if any resource height is equal to the hub-height
         if any(float(hh) == float(hub_height_meters) for hh in allowed_hub_height_meters):

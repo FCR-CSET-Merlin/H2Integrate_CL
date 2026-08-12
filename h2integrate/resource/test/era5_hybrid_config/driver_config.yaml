@@ -1,0 +1,5 @@
+name: era5_hybrid_driver
+description: Non-optimizing driver for the ERA5 wind-solar integration test.
+general:
+  folder_output: outputs
+  create_om_reports: false

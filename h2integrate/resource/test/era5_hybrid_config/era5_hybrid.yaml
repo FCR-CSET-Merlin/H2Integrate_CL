@@ -1,0 +1,7 @@
+name: era5_hybrid_integration
+system_summary: >-
+  Integration test connecting local ERA5 Single Levels wind and solar resources
+  to PySAM technologies and a renewable electricity combiner.
+driver_config: driver_config.yaml
+technology_config: tech_config.yaml
+plant_config: plant_config.yaml

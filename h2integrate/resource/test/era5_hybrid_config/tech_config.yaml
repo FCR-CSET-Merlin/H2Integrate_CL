@@ -1,0 +1,49 @@
+name: era5_hybrid_technologies
+description: PySAM wind and PV technologies used by the ERA5 integration test.
+technologies:
+  wind:
+    performance_model:
+      model: PYSAMWindPlantPerformanceModel
+    model_inputs:
+      performance_parameters:
+        num_turbines: 2
+        turbine_rating_kw: 3000.0
+        hub_height: 100.0
+        rotor_diameter: 120.0
+        create_model_from: default
+        config_name: WindPowerSingleOwner
+        pysam_options:
+          Farm:
+            wind_farm_wake_model: 0
+        layout:
+          layout_mode: basicgrid
+          layout_options:
+            row_D_spacing: 5.0
+            turbine_D_spacing: 5.0
+            rotation_angle_deg: 0.0
+            row_phase_offset: 0.0
+            layout_shape: square
+  solar:
+    performance_model:
+      model: PYSAMSolarPlantPerformanceModel
+    model_inputs:
+      performance_parameters:
+        pv_capacity_kWdc: 5000.0
+        dc_ac_ratio: 1.2
+        create_model_from: default
+        config_name: PVWattsSingleOwner
+        tilt_angle_func: lat
+        pysam_options:
+          SystemDesign:
+            array_type: 0
+            azimuth: 0.0
+          SolarResource:
+            albedo_default: 0.2
+  renewable_combiner:
+    performance_model:
+      model: GenericCombinerPerformanceModel
+    model_inputs:
+      performance_parameters:
+        commodity: electricity
+        commodity_rate_units: kW
+        in_streams: 2

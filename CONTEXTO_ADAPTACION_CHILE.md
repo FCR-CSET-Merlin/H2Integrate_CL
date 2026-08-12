@@ -566,12 +566,15 @@ La secuencia de trabajo será:
 9. Documentar configuración, supuestos, limitaciones y trazabilidad; evaluar optimizaciones
    de caché o formatos remotos únicamente después de validar la primera implementación.
 
-Al 12 de agosto de 2026 se encuentran implementados los pasos 1 a 5: contrato técnico,
-dependencias opcionales, lector común anual y transformaciones eólicas y solares comunes.
-Las salidas normalizadas conservan los contratos `wind_resource_data` y
-`solar_resource_data` usados por los convertidores existentes. La creación de los
-componentes de recurso ERA5 y la política de advertencia para bujes superiores a 100 m
-permanecen en el paso 6, donde ya se conoce la altura solicitada.
+Al 12 de agosto de 2026 se encuentran implementados los pasos 1 a 7 y la integración
+funcional principal del paso 8: contrato técnico, dependencias opcionales, lector común
+anual, transformaciones, componentes OpenMDAO, fixtures sintéticos y un caso híbrido
+configurado mediante YAML. Las salidas conservan los contratos `wind_resource_data` y
+`solar_resource_data` usados por PySAM. El caso integral conecta ambos recursos con
+tecnologías eólica y FV, y combina sus perfiles eléctricos horarios. El convertidor eólico
+advierte y utiliza 100 m, sin extrapolar, cuando el buje supera la altura máxima disponible
+en ERA5. Continúan pendientes las comparaciones con fuentes independientes indicadas en el
+paso 8 y las optimizaciones posteriores del paso 9.
 
 Los archivos ERA5-SL de prueba disponibles para 2023 tienen una grilla regular de 0,25°
 sobre Chile, 8.760 registros horarios continuos y variables eólicas, solares y auxiliares

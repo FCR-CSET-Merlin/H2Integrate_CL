@@ -329,9 +329,10 @@ Cuando `u = v = 0`, la fórmula vectorial devuelve de manera determinista 270°,
 dirección carece de significado físico porque la velocidad es cero. Los consumidores no
 deben interpretar la dirección de muestras calmas.
 
-La advertencia por uso de viento de 100 m en bujes superiores se implementará en la capa de
-integración que conoce la altura de buje solicitada. El transformador común conserva ambas
-alturas ERA5 y no decide qué altura consume cada tecnología.
+La advertencia por uso de viento de 100 m en bujes superiores se implementa en el
+convertidor eólico, que conoce la altura solicitada. El transformador común conserva ambas
+alturas ERA5 y no decide qué altura consume cada tecnología. Cuando el buje excede la altura
+máxima disponible, advierte la altura solicitada y utilizada, y no extrapola verticalmente.
 
 ## 17. Transformaciones solares comunes implementadas
 
@@ -356,6 +357,78 @@ registra el número de correcciones.
 
 El umbral cenital es configurable y vale 88° por defecto. Para ángulos iguales o superiores,
 noche o coseno cenital no positivo, DNI se fija en cero. La validación anual inicial confirmó
-que el recurso resultante es aceptado por `PySAM.Pvwattsv8`; la evaluación energética de un
-componente PV completo y la sensibilidad a la convención del registro de las 00 UTC se
-mantienen como pruebas de integración posteriores.
+que el recurso resultante es aceptado por `PySAM.Pvwattsv8`. La prueba integral ejecuta un
+componente PV completo con datos sintéticos y reales. La sensibilidad a la convención del
+registro de las 00 UTC, junto con la comparación contra fuentes independientes, se mantiene
+como validación posterior.
+
+## 18. Componentes OpenMDAO implementados
+
+`ERA5SingleLevelsWindResource` y `ERA5SingleLevelsSolarResource`, definidos en
+`h2integrate/resource/era5_resource.py`, integran el lector y las transformaciones comunes
+sin modificar los contratos consumidos por PySAM y FLORIS. Ambos están registrados en
+`h2integrate/core/supported_models.py` y exigen `dt = 3600` segundos y `timezone = 0` (UTC).
+
+Configuración mínima de referencia:
+
+```yaml
+resources:
+  wind_resource:
+    resource_model: ERA5SingleLevelsWindResource
+    resource_parameters:
+      resource_year: 2023
+      resource_dir: /ruta/administrada/era5
+  solar_resource:
+    resource_model: ERA5SingleLevelsSolarResource
+    resource_parameters:
+      resource_year: 2023
+      resource_dir: /ruta/administrada/era5
+      maximum_zenith_angle_deg: 88.0
+```
+
+`resource_dir` se declara por recurso y no está codificado en el módulo. Los patrones
+mensuales, `include_leap_day`, `nearest_distance_warning_km` y la elevación pueden
+configurarse. Si el sitio contiene `elevation`, se utiliza como valor predeterminado de
+`site_elevation_m`.
+
+Con `use_fixed_resource_location: true`, valor predeterminado, el componente calcula el
+recurso una vez durante `setup()`. Con `false`, compara las entradas OpenMDAO de latitud y
+longitud y vuelve a seleccionar y transformar los datos solamente cuando cambian. Esta
+modalidad permite barridos geoespaciales, pero la primera implementación reabre los archivos
+mensuales; una caché anual compartida queda como optimización futura.
+
+Los componentes son exclusivamente locales: un archivo ausente produce error y no activa
+una descarga remota implícita.
+
+## 19. Configuración integral ERA5, PySAM y OpenMDAO
+
+La configuración versionada de la prueba se encuentra en
+`h2integrate/resource/test/era5_hybrid_config/`. El archivo `era5_hybrid.yaml`
+referencia configuraciones separadas de driver, planta y tecnologías para verificar el
+mismo mecanismo de resolución de archivos YAML utilizado por los casos de H2Integrate.
+
+El grafo probado contiene:
+
+- `ERA5SingleLevelsWindResource → PYSAMWindPlantPerformanceModel`.
+- `ERA5SingleLevelsSolarResource → PYSAMSolarPlantPerformanceModel`.
+- Dos cables sin pérdidas y un `GenericCombinerPerformanceModel` eléctrico.
+
+Para evitar rutas locales codificadas, el archivo de planta usa el marcador
+`__ERA5_RESOURCE_DIR__` en los dos parámetros `resource_dir`. El fixture copia los YAML
+a un directorio temporal, sustituye allí el marcador por el recurso sintético y conserva
+intactos los archivos versionados.
+
+La prueba sintética ejecuta las 8.760 horas de 2023, exige perfiles eólico, solar y combinado
+con dimensiones correctas, valores finitos y no negativos, producción positiva de ambas
+tecnologías, y verifica que el combinador sea exactamente la suma de sus entradas.
+
+Como validación adicional no versionada, la misma configuración se ejecutó sobre los 36
+NetCDF disponibles en `ERA5_SL_test_TEA`. Se obtuvieron 8.760 horas, 479.826,79 kWh eólicos,
+10.484.520,09 kWh solares y 10.964.346,88 kWh combinados, con un error máximo de balance de
+4,55 × 10⁻¹³ kW. El punto seleccionado fue (-23,50°, -68,25°), a 7,54 km del sitio
+solicitado.
+La producción corresponde a las capacidades de prueba —6 MW eólicos y 5 MWdc solares— y
+no constituye todavía un benchmark energético independiente.
+
+Permanecen pendientes la comparación de perfiles con fuentes independientes y la evaluación
+específica de la convención ERA5 para la hora que termina a las 00 UTC, según el plan.

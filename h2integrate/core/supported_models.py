@@ -16,6 +16,10 @@ from h2integrate.converters.hopp.hopp_wrapper import HOPPComponent
 from h2integrate.converters.solar.solar_pysam import PYSAMSolarPlantPerformanceModel
 from h2integrate.finances.numpy_financial_npv import NumpyFinancialNPV
 from h2integrate.resource.wind.openmeteo_wind import OpenMeteoHistoricalWindResource
+from h2integrate.resource.era5_resource import (
+    ERA5SingleLevelsSolarResource,
+    ERA5SingleLevelsWindResource,
+)
 from h2integrate.storage.generic_storage_cost import GenericStorageCostModel
 from h2integrate.storage.hydrogen.mch_storage import MCHTOLStorageCostModel
 from h2integrate.converters.wind.atb_wind_cost import ATBWindPlantCostModel
@@ -181,6 +185,8 @@ supported_models = {
     "WTKNLRDeveloperAPIWindResource": WTKNLRDeveloperAPIWindResource,
     "OpenMeteoHistoricalWindResource": OpenMeteoHistoricalWindResource,
     "OpenMeteoHistoricalSolarResource": OpenMeteoHistoricalSolarResource,
+    "ERA5SingleLevelsWindResource": ERA5SingleLevelsWindResource,
+    "ERA5SingleLevelsSolarResource": ERA5SingleLevelsSolarResource,
     "GOESAggregatedSolarAPI": GOESAggregatedSolarAPI,
     "GOESConusSolarAPI": GOESConusSolarAPI,
     "GOESFullDiscSolarAPI": GOESFullDiscSolarAPI,
