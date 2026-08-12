@@ -167,6 +167,10 @@ DNI = BHI / cos(ángulo cenital)
 del período de acumulación. DNI será cero durante la noche o cuando el ángulo cenital no
 permita una división numéricamente estable.
 
+El umbral predeterminado será un ángulo cenital de 88°, consistente con el control de
+horizonte predeterminado de `pvlib`, y podrá configurarse. Los registros con componente
+directa horizontal positiva que sean anulados por este control se contabilizarán.
+
 Si `FDIR > SSRD`, la componente directa horizontal se limitará a GHI, se contabilizará la
 corrección y se emitirá una advertencia de control de calidad. Los valores originales no se
 sobrescribirán en los datos fuente.
@@ -269,3 +273,89 @@ La implementación deberá demostrar mediante pruebas que:
 - Emite los errores y advertencias definidos.
 - Mantiene compatibilidad con PySAM eólico y solar.
 - No altera los recursos meteorológicos existentes.
+
+## 15. Lector común implementado
+
+`ERA5SingleLevelsReader`, definido en `h2integrate/resource/era5_reader.py`, implementa la
+primera capa del contrato. Su responsabilidad termina en la entrega de un `xarray.Dataset`
+anual seleccionado y validado; no calcula todavía las variables derivadas eólicas o
+solares.
+
+Ejemplo de uso:
+
+```python
+from h2integrate.resource.era5_reader import ERA5SingleLevelsReader
+
+reader = ERA5SingleLevelsReader(
+    resource_dir="/ruta/administrada/era5",
+    resource_year=2023,
+    nearest_distance_warning_km=15.0,
+)
+annual_site_data = reader.read_site(
+    latitude=-23.45,
+    longitude=-68.25,
+    categories=["wind", "solar", "auxiliary"],
+)
+```
+
+El lector resuelve los doce archivos de cada categoría, valida variables, unidades,
+dimensiones, grilla, `number`, `expver` y continuidad horaria, y carga solamente el punto
+de grilla seleccionado. La salida registra los archivos utilizados, coordenadas solicitadas
+y seleccionadas, distancia a la grilla, método espacial, versión, miembro y cobertura
+temporal.
+
+## 16. Transformaciones eólicas comunes implementadas
+
+`transform_era5_wind_dataset`, definida en `h2integrate/resource/era5_wind.py`, transforma
+el dataset puntual anual de las categorías `wind` y `auxiliary` al contrato
+`wind_resource_data` existente. La función no depende de OpenMDAO y puede reutilizarse por
+los adaptadores PySAM y FLORIS.
+
+La salida incluye:
+
+- `wind_speed_10m`, `wind_direction_10m`, `wind_speed_100m` y
+  `wind_direction_100m`.
+- `temperature_2m` en °C y `pressure_0m` en atm.
+- Año, mes, día, hora y minuto; `data_tz = 0` y `dt = 3600`.
+- Elevación utilizada y elevación ERA5 calculada con `z / 9.80665`.
+- Coordenadas, archivos fuente, unidades originales y transformaciones aplicadas.
+
+La transformación exige datos UTC explícitos, unidades ERA5 compatibles, series finitas,
+presión positiva, temperatura no inferior al cero absoluto y geopotencial superficial
+constante. Si existe una elevación configurada para el sitio, esta prevalece sin corregir
+automáticamente la presión; la elevación ERA5 permanece disponible como metadato.
+
+Cuando `u = v = 0`, la fórmula vectorial devuelve de manera determinista 270°, aunque la
+dirección carece de significado físico porque la velocidad es cero. Los consumidores no
+deben interpretar la dirección de muestras calmas.
+
+La advertencia por uso de viento de 100 m en bujes superiores se implementará en la capa de
+integración que conoce la altura de buje solicitada. El transformador común conserva ambas
+alturas ERA5 y no decide qué altura consume cada tecnología.
+
+## 17. Transformaciones solares comunes implementadas
+
+`transform_era5_solar_dataset`, definida en `h2integrate/resource/era5_solar.py`, transforma
+el dataset puntual anual de las categorías `solar`, `wind` y `auxiliary` al contrato
+`solar_resource_data`. La función utiliza `pvlib` para calcular la posición solar verdadera
+en `valid_time - 30 minutos` y mantiene los timestamps de salida en `valid_time` UTC.
+
+La salida incluye:
+
+- `ghi`, `dhi` y `dni` en W/m², además del ángulo cenital usado.
+- Temperatura y punto de rocío en °C, presión en mbar, y viento a 10 m.
+- Año, mes, día, hora y minuto; `data_tz = 0` y `dt = 3600`.
+- Elevación utilizada, elevación ERA5, parámetros de geometría, conteos de correcciones y
+  proveniencia del lector común.
+
+La transformación rechaza acumulaciones negativas, unidades incompatibles, presión no
+positiva, temperaturas inferiores al cero absoluto, punto de rocío más de 0,1 K sobre la
+temperatura y geopotencial superficial variable. Si `fdir > ssrd`, limita la componente
+directa horizontal a GHI, conserva intacto el dataset fuente, emite una advertencia y
+registra el número de correcciones.
+
+El umbral cenital es configurable y vale 88° por defecto. Para ángulos iguales o superiores,
+noche o coseno cenital no positivo, DNI se fija en cero. La validación anual inicial confirmó
+que el recurso resultante es aceptado por `PySAM.Pvwattsv8`; la evaluación energética de un
+componente PV completo y la sensibilidad a la convención del registro de las 00 UTC se
+mantienen como pruebas de integración posteriores.

@@ -87,3 +87,65 @@ descargados ni resultados voluminosos.
   Ruff no se ejecutó porque no está instalado en el entorno actual.
 - **Estado:** Completado.
 - **Responsable:** Codex.
+
+## 2026-08-12 11:04:02 -04 — Implementación del lector común ERA5-SL
+
+- **Resumen y propósito:** Se implementó el lector común de archivos ERA5 Single Levels
+  mensuales para seleccionar un sitio por vecino más cercano y entregar una serie anual
+  validada, reutilizable por los futuros recursos eólico y solar.
+- **Archivos modificados:** `h2integrate/resource/era5_reader.py`,
+  `h2integrate/resource/test/test_era5_reader.py`,
+  `docs/resource/era5_single_levels_contract.md` y `REGISTRO_ACTIVIDAD.md`.
+- **Supuestos o decisiones:** El lector acepta patrones relativos configurables, exige doce
+  archivos por categoría, un miembro determinista, un `expver` homogéneo, grillas idénticas
+  y frecuencia horaria UTC. La advertencia de distancia `nearest` conserva el valor
+  predeterminado configurable de 15 km. Las transformaciones meteorológicas quedan fuera de
+  esta capa.
+- **Verificación:** 9 pruebas ERA5 aprobadas; lectura de los 36 NetCDF reales correcta,
+  produciendo 8.760 horas y 13 variables para el sitio solicitado; sintaxis Python y
+  `git diff --check` correctos.
+- **Estado:** Completado.
+- **Responsable:** Codex.
+
+## 2026-08-12 12:02:23 -04 — Transformaciones eólicas comunes ERA5-SL
+
+- **Resumen y propósito:** Se implementó una transformación reutilizable del dataset anual
+  puntual ERA5 al contrato `wind_resource_data` consumido por los convertidores eólicos de
+  H2Integrate.
+- **Archivos modificados:** `h2integrate/resource/era5_wind.py`,
+  `h2integrate/resource/test/test_era5_wind.py`,
+  `docs/resource/era5_single_levels_contract.md`, `CONTEXTO_ADAPTACION_CHILE.md` y
+  `REGISTRO_ACTIVIDAD.md`.
+- **Supuestos o decisiones:** Se aplican las fórmulas vectoriales acordadas a 10 y 100 m,
+  temperatura K a °C, presión Pa a atm y elevación `z / 9.80665`. La elevación configurada
+  prevalece y no modifica la presión. Las calmas conservan el resultado determinista de la
+  fórmula angular, pero su dirección no tiene significado físico. La advertencia para
+  bujes sobre 100 m se reserva para la integración que conoce la altura solicitada.
+- **Verificación:** 18 pruebas ERA5 aprobadas. Los 24 NetCDF reales eólicos y auxiliares
+  produjeron 8.760 registros; la salida fue aceptada por los formateadores existentes de
+  PySAM (matriz 8.760 × 4 finita) y FLORIS (8.760 estados). Compilación sintáctica y
+  `git diff --check` correctos. Ruff no está instalado en el entorno actual.
+- **Estado:** Completado.
+- **Responsable:** Codex.
+
+## 2026-08-12 12:37:35 -04 — Transformaciones solares comunes ERA5-SL
+
+- **Resumen y propósito:** Se implementó la transformación reutilizable del dataset puntual
+  ERA5 al contrato `solar_resource_data`, incluyendo irradiancia, variables meteorológicas,
+  geometría solar, controles físicos y proveniencia.
+- **Archivos modificados:** `h2integrate/resource/era5_solar.py`,
+  `h2integrate/resource/test/test_era5_solar.py`,
+  `docs/resource/era5_single_levels_contract.md`, `CONTEXTO_ADAPTACION_CHILE.md` y
+  `REGISTRO_ACTIVIDAD.md`.
+- **Supuestos o decisiones:** Las acumulaciones son horarias y terminan en `valid_time`; la
+  geometría se calcula 30 minutos antes con `pvlib`. DNI se anula desde un cenit configurable
+  de 88° por defecto. `fdir > ssrd` se limita en la salida con advertencia, sin modificar el
+  dataset fuente. La presión se entrega en mbar y la elevación configurada prevalece sobre
+  `z / 9.80665` sin corregir la presión.
+- **Verificación:** 28 pruebas ERA5 aprobadas. La transformación de los 36 NetCDF reales
+  produjo 8.760 registros finitos: GHI máximo 1.221,16 W/m², DHI 490,79 W/m² y DNI
+  1.113,18 W/m²; no hubo correcciones `fdir > ssrd` y 420 registros directos se anularon por
+  el control cenital. `PySAM.Pvwattsv8` aceptó el recurso formateado. Sintaxis Python,
+  longitud de línea, espacios finales y `git diff --check` correctos; Ruff no está instalado.
+- **Estado:** Completado.
+- **Responsable:** Codex.
