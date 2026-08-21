@@ -251,3 +251,27 @@ descargados ni resultados voluminosos.
 - **Estado:** Jornada cerrada; quedan pendientes las validaciones independientes indicadas
   en el paso 8 y las optimizaciones del paso 9.
 - **Responsable:** Codex.
+
+## 2026-08-21 11:10:27 -04 — Incorporación de catálogo JSON de aerogeneradores
+
+- **Resumen y propósito:** Se incorporó al control de versiones el catálogo de 67 archivos
+  JSON de modelos de aerogeneradores proporcionado por el usuario, destinado a ampliar las
+  curvas de potencia disponibles para evaluaciones eólicas y casos de validación como el
+  Parque Eólico Totoral.
+- **Archivos modificados:** Los 67 archivos JSON nuevos de
+  `resource_files/wombat_library/turbines/` y `REGISTRO_ACTIVIDAD.md`.
+- **Supuestos o decisiones:** Las magnitudes de velocidad y potencia se interpretan como
+  m/s y W, respectivamente, de acuerdo con la estructura y escala de los datos. En esta
+  actividad se validó la consistencia interna del catálogo, pero no su procedencia técnica,
+  licencia ni correspondencia con curvas certificadas de fabricantes. Los CSV meteorológicos
+  de `resource_files/wind/` permanecen excluidos por `.gitignore` y no se incorporan al commit,
+  en cumplimiento de la política de no versionar datasets descargados. Se normalizaron los
+  finales de línea de los JSON de CRLF a LF, sin alterar sus datos.
+- **Verificación:** Los 67 archivos se decodificaron correctamente como JSON; todos contienen
+  `name`, `rated_power`, `cut_in`, `rated_speed`, `wind_speeds` y `power`; los nombres son
+  únicos; las curvas tienen longitudes coincidentes, valores numéricos finitos, velocidades
+  estrictamente crecientes y potencias no negativas. El catálogo normalizado suma 87.106 bytes.
+- **Resultado:** Catálogo válido para su incorporación como datos de referencia; no se
+  modificaron interfaces públicas ni dependencias.
+- **Estado:** Completado y preparado para commit.
+- **Responsable:** Codex.
