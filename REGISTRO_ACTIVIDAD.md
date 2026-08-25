@@ -275,3 +275,123 @@ descargados ni resultados voluminosos.
   modificaron interfaces públicas ni dependencias.
 - **Estado:** Completado y preparado para commit.
 - **Responsable:** Codex.
+
+## 2026-08-24 11:09:19 -04 — Comparación eólica multifuente del Parque Eólico Taltal
+
+- **Resumen y propósito:** Se simuló la generación horaria y diaria del Parque Eólico Taltal
+  durante 2015 a partir de velocidades a 100 m del Explorador Eólico (WRF), ERA5, Sup3rWind y
+  MERRA-2, y se comparó con la generación bruta diaria proporcionada por el usuario y atribuida
+  a la CNE.
+- **Archivos modificados:** Se generaron siete resultados ignorados por Git en
+  `resource_files/wind/taltal_2015_comparison/` (cuatro CSV y tres PNG), y se actualizó
+  `REGISTRO_ACTIVIDAD.md`. Los dos archivos meteorológicos de entrada no fueron modificados.
+- **Supuestos o decisiones:** La referencia `V12/3000` se interpretó como Vestas V112/3000,
+  coherente con la capacidad informada de 33 unidades de 3 MW (99 MW). Se utilizó la curva
+  `V112_3000.json`, normalizada de 3,075 MW a 3 MW por unidad, y las velocidades a 100 m sin
+  extrapolación. La simulación representa generación bruta ideal, sin pérdidas de estela,
+  disponibilidad o eléctricas y sin corrección de densidad del aire. Los días se agregaron en
+  UTC. El archivo conjunto tiene 8.754 horas; sus seis horas faltantes no se imputaron y la
+  energía anual comparable se anualizó desde la potencia media. La columna de generación de
+  Renewables.Ninja no se usó porque corresponde a una V90/2000; MERRA-2 se convirtió desde su
+  columna de velocidad con la misma curva V112/3000 aplicada a las demás fuentes.
+- **Verificación:** Se confirmaron 365 observaciones CNE (267,323 GWh; factor de planta
+  30,82 %), límites horarios simulados de 0 a 99 MW, 8.754 horas sin nulos para WRF/ERA5/
+  Sup3rWind y 8.760 para MERRA-2. Los CSV cubren 2015 y los tres PNG se abrieron y verificaron
+  correctamente. Se compararon sólo días de 24 horas: 363 para las primeras tres fuentes y
+  365 para MERRA-2.
+- **Resultado:** Sup3rWind presentó la mejor aproximación conjunta: 293,714 GWh anualizados,
+  factor de planta 33,87 %, error energético de +9,9 % y correlación diaria de Pearson 0,777.
+  WRF sobreestimó (+57,7 %), ERA5 subestimó (-79,1 %) y MERRA-2 subestimó (-29,7 %).
+- **Estado:** Completado como comparación exploratoria no calibrada; las pérdidas, densidad
+  del aire y convención temporal de la serie CNE deben formalizarse antes de usar los valores
+  como validación definitiva.
+- **Responsable:** Codex.
+
+## 2026-08-24 14:21:24 -04 — Simulación Sup3rWind de tres parques eólicos chilenos
+
+- **Resumen y propósito:** Se simuló la generación horaria, diaria, mensual y el factor de
+  planta de Monte Redondo, Negrete y Valle de los Vientos durante 2015 usando Sup3rWind, y se
+  compararon los resultados con las series diarias suministradas por el usuario y atribuidas
+  a la CNE.
+- **Archivos modificados:** Se leyeron sin modificar tres CSV meteorológicos ignorados por Git
+  en `resource_files/wind/`; se generaron 23 CSV y PNG ignorados en
+  `resource_files/wind/sup3rwind_parks_2015_comparison/`; se actualizó
+  `REGISTRO_ACTIVIDAD.md`.
+- **Supuestos o decisiones:** Se modelaron 24 V90/2000 de 2 MW en Monte Redondo, 10 V126/3450
+  de 3,45 MW como proxy de las V136/3450 de Negrete y 45 V90/2000 de 2 MW como proxy de las
+  V100/2000 informadas para Valle de los Vientos. El encabezado Sup3rWind de este último indica
+  V110/2000, discrepancia conservada como antecedente. Las curvas se normalizaron a la potencia
+  nominal y, cuando terminan antes de la velocidad de corte, se mantuvo su última potencia hasta
+  25 m/s y se supuso generación nula sobre ese valor. El escenario principal usa directamente
+  el viento a 100 m para conservar comparabilidad con Taltal. Como sensibilidad física se aplicó
+  densidad seca `rho=p/(R*T)` y velocidad equivalente `v*(rho/1,225)^(1/3)` con presión a 0 m y
+  temperatura a 2 m. No se modelaron estelas, disponibilidad ni pérdidas eléctricas; la
+  agregación diaria es UTC.
+- **Verificación:** Cada recurso contiene 8.760 horas completas, sin duplicados ni nulos; las
+  distancias a los nodos son 0,601 km, 0,210 km y 0,791 km. Las tres series CNE contienen 365
+  días y suman 99,601 GWh, 94,114 GWh y 232,216 GWh. Se comprobaron límites de generación,
+  nueve filas de métricas, 365 días, 12 meses y ausencia de nulos por parque; los diez PNG se
+  abrieron correctamente.
+- **Resultado:** Sin corrección de densidad, los errores anuales fueron +61,1 % en Monte
+  Redondo, +68,4 % en Negrete y +15,0 % en Valle de los Vientos. Con corrección fueron +59,5 %,
+  +68,0 % y -3,8 %, respectivamente. Las correlaciones diarias ajustadas fueron 0,830, 0,822 y
+  0,406. La densidad sólo cambió materialmente el resultado del emplazamiento de mayor altitud.
+- **Estado:** Completado como comparación exploratoria no calibrada. Deben confirmarse modelos
+  exactos, alturas de buje, convención temporal CNE y pérdidas antes de una validación definitiva.
+- **Responsable:** Codex.
+
+## 2026-08-25 14:59:03 -04 — Simulación Sup3rWind 2023 de cuatro parques eólicos
+
+- **Resumen y propósito:** Se simuló y comparó con generación bruta CNE la producción horaria,
+  diaria, mensual y el factor de planta de La Flor, Malleco, Renaico y San Gabriel durante 2023.
+- **Archivos modificados:** Se leyeron sin modificar cuatro CSV Sup3rWind ignorados en
+  `resource_files/wind/`; se generaron 32 CSV y PNG ignorados en
+  `resource_files/wind/sup3rwind_parks_2023_comparison/`; se actualizó
+  `REGISTRO_ACTIVIDAD.md`.
+- **Supuestos o decisiones:** Se adoptaron como capacidades principales las potencias nominales
+  informadas: 32,4 MW para La Flor, 273 MW para Malleco, 88 MW para Renaico y 183 MW para San
+  Gabriel. En La Flor y Malleco difieren en +4,35 % y +2,77 % de `n_turbinas × 3,45 MW`. Se
+  sumaron las series CNE de Malleco Norte y Sur. Se emplearon V126/3450, V90/2000 y N131/3000
+  como proxies acordados, normalizando sus curvas a la capacidad del parque. Se usó viento a
+  100 m, meseta de potencia hasta 25 m/s y corte sobre esa velocidad. Se evaluó el escenario
+  directo y una sensibilidad de densidad con `rho=p/(R*T)` y `v_eq=v*(rho/1,225)^(1/3)`. No se
+  incluyeron estelas, disponibilidad ni pérdidas eléctricas; la agregación diaria es UTC. Para
+  aislar parcialmente las indisponibilidades se calcularon métricas adicionales sobre días CNE
+  mayores que cero.
+- **Verificación:** Los cuatro recursos contienen 8.760 horas completas sin nulos ni duplicados;
+  las distancias a los nodos son 0,329, 0,960, 1,085 y 1,160 km. Las cinco series CNE contienen
+  365 días: 72,812 GWh La Flor, 360,861 GWh Malleco Sur, 325,229 GWh Malleco Norte, 226,455 GWh
+  Renaico y 471,857 GWh San Gabriel; Malleco totaliza 686,090 GWh. Se verificaron 12 filas de
+  métricas, 8.760 horas, 365 días y 12 meses por parque, ausencia de nulos, límites de potencia
+  y apertura correcta de los 13 PNG.
+- **Resultado:** En el escenario ajustado por densidad, La Flor produjo 169,109 GWh (FP 59,58 %,
+  error +132,3 %, r diario 0,621 y r en días activos 0,764); Malleco 1.215,675 GWh (FP 50,83 %,
+  +77,2 %, r 0,781); Renaico 416,626 GWh (FP 54,05 %, +84,0 %, r 0,792); y San Gabriel
+  943,340 GWh (FP 58,85 %, +99,9 %, r 0,822). La densidad tuvo efecto menor en estos cuatro
+  sitios. Sup3rWind capturó parte de la temporalidad, pero sobreestimó sistemáticamente la
+  energía y requiere calibración antes de un uso tecnoeconómico.
+- **Estado:** Completado como comparación exploratoria no calibrada. Deben confirmarse pérdidas,
+  disponibilidad, alturas de buje, modelos exactos y convención temporal CNE.
+- **Responsable:** Codex.
+
+## 2026-08-25 16:12:42 -04 — Consolidación de reportes de validación eólica
+
+- **Resumen y propósito:** Se elaboraron dos reportes técnicos versionables para consolidar los
+  benchmarks eólicos ejecutados con ERA5 Single Levels y Sup3rWind durante 2015 y 2023. Se
+  documentaron metodología, supuestos, métricas, limitaciones, diagnóstico e implicancias para
+  análisis tecnoeconómicos.
+- **Archivos modificados:** Se crearon
+  `docs/resource/reporte_validacion_eolica_era5.md` y
+  `docs/resource/reporte_validacion_eolica_sup3rwind.md`; se añadieron sus enlaces a
+  `docs/resource/resource_index.md`; se actualizó `REGISTRO_ACTIVIDAD.md`. No se modificaron
+  datos meteorológicos, resultados de simulación ni código fuente.
+- **Supuestos o decisiones:** El reporte ERA5 sólo califica como evidencia de subestimación los
+  cuatro casos con referencia independiente; las pruebas de integración sin benchmark se
+  identifican por separado. El reporte Sup3rWind adopta el escenario ajustado por densidad para
+  siete casos y el escenario directo disponible para Taltal. Se conservaron las convenciones
+  UTC, las curvas proxy y las capacidades empleadas en cada simulación, explicitando sus
+  limitaciones y sin interpretar correlación como equivalencia energética.
+- **Verificación:** Se contrastaron las cifras publicadas de los 12 casos con tres CSV de
+  métricas y cuatro JSON fuente. Se comprobaron presencia de indicadores clave, contenido no
+  vacío, finales de línea y ausencia de espacios finales. También se verificaron los enlaces
+  documentales y `git diff --check`.
