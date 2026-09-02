@@ -516,3 +516,25 @@ descargados ni resultados voluminosos.
 - **Estado:** Preparado para publicar la Release; pendiente autorización explícita para commit y
   push de los cambios versionados antes de hacer pública una Release asociada al código.
 - **Responsable:** Codex.
+
+## 2026-09-02 16:53:10 -04 — Publicación de recursos meteorológicos Chile 2023
+
+- **Resumen y propósito:** Se publicó la Release pública e inmutable
+  `chile-weather-2023-v1` asociada al commit `4980cd0c` de la rama
+  `feature/era5-single-levels-resource`, para que los dos DOE híbridos Chile se ejecuten sin
+  credenciales NLR.
+- **Archivos modificados:** Se actualizó únicamente `REGISTRO_ACTIVIDAD.md` en el repositorio.
+  Fuera de Git se publicaron como assets los cuatro CSV ignorados definidos en
+  `examples/chile_hybrid_h2_doe/resource_manifest.yaml`; no se adjuntaron credenciales ni JSON
+  laterales con información sensible.
+- **Supuestos o decisiones:** La Release usa el tag previsto por el manifiesto y se publica como
+  Release final, no borrador ni pre-release. Sus assets son los dos Sup3rWind South America
+  v1.0.0 y los dos NSRDB GOES Full Disc PSM v4 de 2023, uno solar y uno eólico por sitio.
+- **Verificación:** GitHub confirmó cuatro assets en estado `uploaded`, Release pública y no
+  pre-release, con tamaños 1.200.722, 615.304, 1.201.922 y 611.302 bytes. Se descargaron desde
+  las URLs públicas a un directorio temporal vacío mediante `download_resources.py`; los cuatro
+  pasaron la verificación de tamaño y SHA-256 del manifiesto.
+- **Resultado:** Los usuarios externos pueden ejecutar el descargador público del ejemplo sin
+  una cuenta NLR y obtener los recursos exactamente validados para ambos casos.
+- **Estado:** Completado y publicado.
+- **Responsable:** Codex.
