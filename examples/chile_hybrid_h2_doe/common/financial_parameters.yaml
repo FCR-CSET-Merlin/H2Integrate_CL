@@ -1,0 +1,35 @@
+active_case: conservative
+
+shared:
+  finance_model: ProFastLCO
+  params:
+    analysis_start_year: 2027
+    installation_time: 60
+    inflation_rate: 0.03
+    total_income_tax_rate: 0.27
+    capital_gains_tax_rate: 0.27
+    sales_tax_rate: 0.0
+    debt_type: One time loan
+    tax_loss_carry_forward_years: 30
+    tax_losses_monetized: false
+    admin_expense: 0.0
+  capital_items:
+    depr_type: Straight line
+    refurb: [0.0]
+
+cases:
+  conservative:
+    description: Escenario financiero conservador configurable para Chile.
+    params:
+      discount_rate: 0.10
+      debt_equity_ratio: 1.2222222222  # 55% deuda / 45% patrimonio
+      property_tax_and_insurance: 0.010
+      debt_interest_rate: 0.085
+      loan_period_if_used: 15
+      cash_onhand_months: 6
+    capital_items:
+      depr_period: 15
+
+cost_adjustment_parameters:
+  cost_year_adjustment_inflation: 0.025
+  target_dollar_year: 2025

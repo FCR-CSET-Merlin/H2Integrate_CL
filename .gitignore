@@ -158,6 +158,7 @@ reports/*
 # Ignore wind and solar resource data files
 resource_files/wind/*
 resource_files/solar/*
+data/raw/
 
 # Ignore library files
 library/*

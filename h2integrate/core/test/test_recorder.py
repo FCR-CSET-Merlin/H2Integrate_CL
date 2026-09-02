@@ -1,14 +1,35 @@
 import sys
+from pathlib import Path
+
+import openmdao.api as om
 
 import pytest
 
 from h2integrate.core.h2integrate_model import H2IntegrateModel
+from h2integrate.core.pose_optimization import PoseOptimization
 from h2integrate.core.inputs.validation import load_driver_yaml
 
 
 TEST_RECORDER_OUTPUT_FILE0 = "testingtesting_filename.sql"
 TEST_RECORDER_OUTPUT_FILE1 = "testingtesting_filename0.sql"
 TEST_RECORDER_OUTPUT_FILE2 = "testingtesting_filename1.sql"
+
+
+@pytest.mark.unit
+def test_set_recorders_accepts_string_output_folder(tmp_path):
+    """Create a recorder directory when the validated configuration uses a string."""
+    output_folder = tmp_path / "new_output"
+    optimizer = PoseOptimization(
+        {
+            "general": {"folder_output": str(output_folder)},
+            "recorder": {"flag": True, "file": "cases.sql"},
+        }
+    )
+
+    recorder_path = optimizer.set_recorders(om.Problem())
+
+    assert recorder_path == output_folder / "cases.sql"
+    assert output_folder.is_dir()
 
 
 @pytest.mark.unit

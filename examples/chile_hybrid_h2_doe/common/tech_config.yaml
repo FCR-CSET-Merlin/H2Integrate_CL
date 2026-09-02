@@ -1,0 +1,87 @@
+name: tech_config_chile_hybrid_h2_doe
+description: Tecnologías comunes de los dos casos híbridos chilenos.
+technologies:
+  wind:
+    performance_model:
+      model: PYSAMWindPlantPerformanceModel
+    cost_model:
+      model: ATBWindPlantCostModel
+    model_inputs:
+      performance_parameters:
+        num_turbines: 20
+        turbine_rating_kw: 6000
+        rotor_diameter: 170.0
+        hub_height: 115.0
+        create_model_from: default
+        config_name: WindPowerSingleOwner
+        pysam_options: !include "../../../library/pysam_options_6MW.yaml"
+        run_recalculate_power_curve: false
+        layout:
+          layout_mode: basicgrid
+          layout_options:
+            row_D_spacing: 7.0
+            turbine_D_spacing: 7.0
+            rotation_angle_deg: 0.0
+            row_phase_offset: 0.0
+            layout_shape: square
+      cost_parameters:
+        capex_per_kW: 1900.0
+        opex_per_kW_per_year: 55.0
+        cost_year: 2025
+  solar:
+    performance_model:
+      model: PYSAMSolarPlantPerformanceModel
+    cost_model:
+      model: ATBUtilityPVCostModel
+    model_inputs:
+      performance_parameters:
+        pv_capacity_kWdc: 200000
+        dc_ac_ratio: 1.30
+        create_model_from: new
+        tilt_angle_func: lat-func
+        pysam_options:
+          SystemDesign:
+            gcr: 0.3
+            array_type: 2
+            bifaciality: 0.65
+            inv_eff: 97.0
+            losses: 12.0
+            module_type: 1
+            azimuth: 0
+            rotlim: 45
+          SolarResource:
+            albedo_default: 0.25
+      cost_parameters:
+        capex_per_kWac: 1100.0
+        opex_per_kWac_per_year: 22.0
+        cost_year: 2025
+  electricity_combiner:
+    performance_model:
+      model: GenericCombinerPerformanceModel
+    model_inputs:
+      performance_parameters:
+        commodity: electricity
+        commodity_rate_units: kW
+  electrolyzer:
+    performance_model:
+      model: ECOElectrolyzerPerformanceModel
+    cost_model:
+      model: CustomElectrolyzerCostModel
+    model_inputs:
+      performance_parameters:
+        size_mode: normal
+        n_clusters: 20
+        cluster_rating_MW: 10
+        eol_eff_percent_loss: 13
+        uptime_hours_until_eol: 70000.0
+        include_degradation_penalty: true
+        turndown_ratio: 0.1
+        location: onshore
+        electrolyzer_capex: 1200
+      cost_parameters:
+        capex_USD_per_kW: 1200.0
+        fixed_om_USD_per_kW_per_year: 20.0
+        cost_year: 2025
+      financial_parameters:
+        capital_items:
+          replacement_cost_percent: 0.20

@@ -395,3 +395,124 @@ descargados ni resultados voluminosos.
   métricas y cuatro JSON fuente. Se comprobaron presencia de indicadores clave, contenido no
   vacío, finales de línea y ausencia de espacios finales. También se verificaron los enlaces
   documentales y `git diff --check`.
+
+## 2026-09-02 11:43:13 -04 — Integración local Sup3rWind y caso híbrido NSRDB Chile
+
+- **Resumen y propósito:** Se implementó un componente de recurso eólico local para CSV de
+  Sup3rWind y se configuró un caso híbrido horario Sup3rWind–NSRDB en Monte Redondo, Chile.
+- **Archivos modificados:** `h2integrate/resource/wind/sup3rwind.py`,
+  `h2integrate/resource/wind/test/test_sup3rwind.py`,
+  `h2integrate/core/supported_models.py`, los cuatro archivos de
+  `examples/chile_sup3rwind_nsrdb/`, `docs/resource/resource_index.md` y
+  `REGISTRO_ACTIVIDAD.md`.
+- **Supuestos o decisiones:** El adaptador es local y no descarga Sup3rWind; admite el CSV
+  compacto usado en las validaciones chilenas y el formato tipo Wind Toolkit. El contrato es
+  horario UTC y elimina el 29 de febrero salvo configuración contraria. El caso usa 2015 y las
+  coordenadas de Monte Redondo; NSRDB se representa con GOES Aggregated PSM v4. Los parámetros
+  tecnológicos y financieros del ejemplo 15 son sólo ilustrativos y no están calibrados para
+  Chile ni para el parque real.
+- **Verificación:** Se añadieron pruebas de registro, lectura de ambos formatos, conversión de
+  presión Pa a atm, metadatos, rechazo de resolución no horaria y ausencia de descarga implícita.
+  Se obtuvieron 9 pruebas y 13 subpruebas aprobadas; también se verificaron sintaxis, carga YAML,
+  longitudes de línea y `git diff --check`. Ruff no estaba instalado en el entorno del proyecto.
+- **Resultado:** H2Integrate puede consumir recursos locales Sup3rWind mediante
+  `Sup3rWindResource` y dispone de un caso híbrido reproducible al instalar los dos datasets o
+  configurar las credenciales NSRDB.
+- **Estado:** Completado para integración meteorológica; pendiente calibrar tecnologías, costos
+  y pérdidas para un caso tecnoeconómico representativo de Chile.
+- **Responsable:** Codex.
+
+## 2026-09-02 12:20:36 -04 — Dos casos híbridos DOE conservadores para Chile
+
+- **Resumen y propósito:** Se adaptó el DOE financiero de `h2v_tea`, commit
+  `83697595971ba01d1dd3b97ed9ada174917e395c`, para evaluar por separado los sitios de
+  Antofagasta `(-22.2812687, -69.5698745)` y Magallanes
+  `(-52.8502704, -70.9575804)` con recursos Sup3rWind y NSRDB de 2023.
+- **Archivos modificados:** Se creó `examples/chile_hybrid_h2_doe/` con configuraciones comunes,
+  dos configuraciones de sitio, 72 diseños DOE, escenario financiero, manifiesto, descargador,
+  ejecutor, documentación y exclusiones de datos/resultados. Se creó
+  `examples/test/test_chile_hybrid_h2_doe.py`, se sustituyó el enlace en
+  `docs/resource/resource_index.md` y se retiró el caso provisional
+  `examples/chile_sup3rwind_nsrdb/`.
+- **Supuestos o decisiones:** Cada sitio evalúa cuatro tamaños FV, tres cantidades de turbinas
+  de 6 MW y seis tamaños PEM, para 72 diseños por sitio y 144 en total. Se conservó el DOE de
+  referencia sin la variante de 35 clústeres. El escenario usa USD 2025, descuento de 10%,
+  deuda/patrimonio 55/45, interés de 8,5%, impuesto de 27%, inflación de 3% y depreciación lineal
+  de 15 años. No se modelan red, batería, almacenamiento, agua, compresión, transporte,
+  oxígeno, incentivos ni créditos de carbono.
+- **Verificación:** Finalizaron correctamente 13 tests y 13 subpruebas del DOE, del adaptador
+  Sup3rWind y de las herramientas eólicas relacionadas. Se validaron los esquemas YAML, las 72
+  combinaciones únicas, la fusión financiera, la lectura de un CSV Sup3rWind anual real y el
+  rechazo seguro de un manifiesto sin publicar.
+- **Resultado:** Los dos casos y el flujo de descarga pública quedan implementados. El
+  descargador exige URL HTTPS, tamaño y SHA-256 reales para los cuatro CSV y no usa credenciales
+  NLR.
+- **Estado:** Implementación estructural completada; bloqueada la ejecución meteorológica y la
+  publicación del manifiesto hasta obtener, validar y adjuntar los cuatro CSV a una Release.
+- **Responsable:** Codex.
+
+## 2026-09-02 15:20:20 -04 — Descargador reproducible NLR para Sup3rWind y NSRDB
+
+- **Resumen y propósito:** Se cerró la brecha de adquisición directa de datos meteorológicos
+  implementando un CLI genérico para descargar recursos puntuales horarios de Sup3rWind South
+  America v1.0.0 y NSRDB GOES Aggregated PSM v4 desde `developer.nlr.gov`.
+- **Archivos modificados:** Se crearon
+  `h2integrate/tools/download_nlr_resources.py`,
+  `h2integrate/tools/test/test_download_nlr_resources.py` y
+  `docs/resource/nlr_resource_downloader.md`; se actualizaron `.gitignore`,
+  `docs/resource/resource_index.md`, `examples/chile_hybrid_h2_doe/README.md` y este registro.
+- **Supuestos o decisiones:** El contrato fija intervalos de 60 minutos en UTC, excluye el 29 de
+  febrero de forma predeterminada y solicita de manera secuencial cada recurso–año con una pausa
+  configurable de 1,1 segundos. Sup3rWind admite las alturas publicadas de 10, 40, 80, 100,
+  120, 160 y 200 m; los casos chilenos solicitan 100 y 120 m. Los años se validan como 2005–2024
+  para Sup3rWind y 1998–2025 para NSRDB. Se conservaron `NLR_API_KEY` y `NLR_API_EMAIL` como
+  convención de credenciales del repositorio. Los CSV se almacenan byte por byte sin modificar y
+  sus JSON laterales omiten clave y correo. `data/raw/` queda ignorado por Git.
+- **Verificación:** Se añadieron 21 pruebas unitarias sin acceso a red para WKT y precisión de
+  coordenadas, validación de límites, años y alturas, parámetros específicos de cada API,
+  respuestas 200/400/500, timeout, contenido no CSV, escritura exacta y atómica, protección
+  contra sobrescritura, metadatos sin secretos y solicitudes separadas por recurso y año.
+  El conjunto dirigido del descargador, adaptador Sup3rWind y DOE completó 30 pruebas; también
+  pasaron la compilación, la revisión de longitud de líneas y `git diff --check`. Ruff no está
+  instalado en el entorno `h2integrate`.
+- **Resultado:** El mantenedor puede generar de forma trazable los cuatro CSV de 2023 para
+  `site_01_antofagasta` y `site_02_magallanes`. La publicación de esos archivos en una Release y
+  la incorporación de sus URL/checksums al manifiesto siguen siendo el paso necesario para que
+  usuarios sin credenciales ejecuten los casos.
+- **Estado:** Descarga directa implementada y probada; publicación de assets pendiente.
+- **Responsable:** Codex.
+
+## 2026-09-02 16:23:50 -04 — Recursos 2023 Full Disc y manifiesto publicable para DOE Chile
+
+- **Resumen y propósito:** Por autorización explícita se sustituyó NSRDB GOES Aggregated por
+  GOES Full Disc PSM v4 en los dos casos híbridos de Antofagasta y Magallanes. Se descargaron,
+  validaron y prepararon para publicación los cuatro CSV horarios de 2023 y se completó el
+  manifiesto de assets para la Release `chile-weather-2023-v1`.
+- **Archivos modificados:** `h2integrate/tools/download_nlr_resources.py` y su prueba,
+  `examples/chile_hybrid_h2_doe/resource_manifest.yaml`, ambos `plant_config.yaml`, el README
+  del ejemplo, `examples/test/test_chile_hybrid_h2_doe.py`,
+  `h2integrate/core/pose_optimization.py`, `h2integrate/core/test/test_recorder.py` y este
+  registro. Los cuatro CSV y sus JSON de procedencia se almacenaron en rutas ignoradas bajo
+  `data/raw/` y `examples/chile_hybrid_h2_doe/data/`; no se versionaron datos ni credenciales.
+- **Supuestos o decisiones:** Los dos sitios usan 2023, UTC, 60 minutos y 8.760 registros. La
+  consulta GOES Aggregated devolvió ausencia de datos para ambas coordenadas, mientras que GOES
+  Full Disc respondió datos puntuales válidos; se adopta por tanto el endpoint Full Disc,
+  disponible para 2018--2025. La Release prevista contendrá sólo los cuatro CSV sin secretos;
+  cada URL del manifiesto incluye el tag `chile-weather-2023-v1` y permanece inaccesible hasta
+  su publicación. La ruta de salida del driver continúa siendo texto, como exige su esquema;
+  el registrador la convierte internamente a `Path` al crear una carpeta nueva.
+- **Verificación:** Se validaron los cuatro CSV con 8.760 horas únicas desde 2023-01-01 00:00
+  hasta 2023-12-31 23:00 UTC, resolución de 60 minutos y cero celdas nulas. Los SHA-256 y
+  tamaños del manifiesto coincidieron con los archivos: Antofagasta Sup3rWind 1.200.722 bytes,
+  Full Disc 615.304 bytes; Magallanes Sup3rWind 1.201.922 bytes, Full Disc 611.302 bytes.
+  `download_resources.py --verify-only`, compilación de módulos y `git diff --check` pasaron.
+  Los dos modelos construyen como `H2IntegrateModel` bajo el caso financiero `conservative`.
+  Las pruebas dirigidas completaron 31 aprobadas; sólo quedó una advertencia externa de
+  deprecación de `h5pyd`.
+- **Resultado:** Los dos casos quedan configurados con Sup3rWind y GOES Full Disc, recursos
+  locales verificados y manifiesto íntegro listo para una Release pública descargable sin cuenta
+  NLR. La corrección del registrador elimina el fallo al crear una carpeta de salida inexistente
+  especificada como texto.
+- **Estado:** Preparado para publicar la Release; pendiente autorización explícita para commit y
+  push de los cambios versionados antes de hacer pública una Release asociada al código.
+- **Responsable:** Codex.

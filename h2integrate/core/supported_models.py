@@ -16,6 +16,7 @@ from h2integrate.converters.hopp.hopp_wrapper import HOPPComponent
 from h2integrate.converters.solar.solar_pysam import PYSAMSolarPlantPerformanceModel
 from h2integrate.finances.numpy_financial_npv import NumpyFinancialNPV
 from h2integrate.resource.wind.openmeteo_wind import OpenMeteoHistoricalWindResource
+from h2integrate.resource.wind.sup3rwind import Sup3rWindResource
 from h2integrate.resource.era5_resource import (
     ERA5SingleLevelsSolarResource,
     ERA5SingleLevelsWindResource,
@@ -184,6 +185,7 @@ supported_models = {
     "RiverResource": RiverResource,
     "WTKNLRDeveloperAPIWindResource": WTKNLRDeveloperAPIWindResource,
     "OpenMeteoHistoricalWindResource": OpenMeteoHistoricalWindResource,
+    "Sup3rWindResource": Sup3rWindResource,
     "OpenMeteoHistoricalSolarResource": OpenMeteoHistoricalSolarResource,
     "ERA5SingleLevelsWindResource": ERA5SingleLevelsWindResource,
     "ERA5SingleLevelsSolarResource": ERA5SingleLevelsSolarResource,

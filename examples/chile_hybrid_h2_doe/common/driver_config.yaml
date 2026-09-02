@@ -1,0 +1,47 @@
+name: driver_chile_hybrid_h2_doe
+description: DOE CSV conservador para los casos híbridos chilenos.
+general:
+  folder_output: outputs
+  create_om_reports: false
+driver:
+  design_of_experiments:
+    flag: true
+    debug_print: false
+    generator: csvgen
+    filename: chile_doe_cases.csv
+    run_parallel: false
+design_variables:
+  solar:
+    system_capacity_DC:
+      flag: true
+      lower: 100000.0
+      upper: 400000.0
+      units: kW
+  wind:
+    num_turbines:
+      flag: true
+      lower: 10
+      upper: 30
+      units: unitless
+  electrolyzer:
+    n_clusters:
+      flag: true
+      lower: 10
+      upper: 40
+      units: unitless
+objective:
+  name: finance_subgroup_hydrogen.LCOH
+recorder:
+  flag: true
+  file: cases.sql
+  overwrite_recorder: true
+  recorder_attachment: driver
+  includes:
+    - solar.system_capacity_DC
+    - wind.num_turbines
+    - electrolyzer.n_clusters
+    - electrolyzer.annual_hydrogen_produced
+    - electrolyzer.capacity_factor
+    - finance_subgroup_*
+  excludes:
+    - '*_resource*'

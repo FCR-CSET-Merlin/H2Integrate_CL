@@ -1,0 +1,34 @@
+name: plant_chile_hybrid_h2_site_01_antofagasta
+description: Caso conservador en las coordenadas -22.2812687, -69.5698745.
+sites:
+  site:
+    latitude: -22.2812687
+    longitude: -69.5698745
+    resources:
+      solar_resource:
+        resource_model: GOESFullDiscSolarAPI
+        resource_parameters:
+          resource_year: 2023
+          resource_dir: ../data
+          resource_filename: site_01_antofagasta_nsrdb_goes_full_disc_v4_2023.csv
+      wind_resource:
+        resource_model: Sup3rWindResource
+        resource_parameters:
+          resource_year: 2023
+          resource_dir: ../data
+          resource_filename: site_01_antofagasta_sup3rwind_2023.csv
+          include_leap_day: false
+resource_to_tech_connections:
+  - [site.solar_resource, solar, solar_resource_data]
+  - [site.wind_resource, wind, wind_resource_data]
+technology_interconnections:
+  - [solar, electricity_combiner, electricity, cable]
+  - [wind, electricity_combiner, electricity, cable]
+  - [electricity_combiner, electrolyzer, electricity, cable]
+plant:
+  plant_life: 30
+  simulation:
+    n_timesteps: 8760
+    dt: 3600
+    start_time: 01/01/2023 00:00:00
+    timezone: 0
