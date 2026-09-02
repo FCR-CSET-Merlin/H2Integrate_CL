@@ -1,0 +1,41 @@
+name: era5_hybrid_plant
+description: Hourly UTC hybrid wind-solar plant driven by local ERA5 Single Levels data.
+sites:
+  site:
+    latitude: -23.45
+    longitude: -68.30
+    elevation: 1250.0
+    resources:
+      wind_resource:
+        resource_model: ERA5SingleLevelsWindResource
+        resource_parameters:
+          resource_year: 2023
+          resource_dir: __ERA5_RESOURCE_DIR__
+          nearest_distance_warning_km: 15.0
+          file_patterns:
+            wind: era5_chile_wind_{year}_{month:02d}.nc
+            auxiliary: era5_chile_auxiliary_{year}_{month:02d}.nc
+      solar_resource:
+        resource_model: ERA5SingleLevelsSolarResource
+        resource_parameters:
+          resource_year: 2023
+          resource_dir: __ERA5_RESOURCE_DIR__
+          nearest_distance_warning_km: 15.0
+          maximum_zenith_angle_deg: 88.0
+          file_patterns:
+            wind: era5_chile_wind_{year}_{month:02d}.nc
+            solar: era5_chile_solar_{year}_{month:02d}.nc
+            auxiliary: era5_chile_auxiliary_{year}_{month:02d}.nc
+technology_interconnections:
+  - [wind, renewable_combiner, electricity, cable]
+  - [solar, renewable_combiner, electricity, cable]
+resource_to_tech_connections:
+  - [site.wind_resource, wind, wind_resource_data]
+  - [site.solar_resource, solar, solar_resource_data]
+plant:
+  plant_life: 30
+  simulation:
+    n_timesteps: 8760
+    dt: 3600
+    start_time: 01/01/2023 00:00:00
+    timezone: 0

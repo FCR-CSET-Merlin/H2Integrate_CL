@@ -1,0 +1,48 @@
+schema_version: 1
+release_status: prepared
+release_tag: chile-weather-2023-v1
+release_notes: >-
+  The four validated CSV assets are prepared for the immutable GitHub Release
+  chile-weather-2023-v1. Their public URLs become downloadable after that release
+  is published.
+resources:
+  - site: site_01_antofagasta
+    kind: wind
+    dataset: Sup3rWind South America v1.0.0
+    year: 2023
+    latitude: -22.2812687
+    longitude: -69.5698745
+    filename: site_01_antofagasta_sup3rwind_2023.csv
+    url: https://github.com/FCR-CSET-Merlin/H2Integrate_CL/releases/download/chile-weather-2023-v1/site_01_antofagasta_sup3rwind_2023.csv
+    sha256: f60153b0c0b4d8e4d49681d9dc62b4564972f305dbeb2e847c52963f6f7e49f2
+    size_bytes: 1200722
+  - site: site_01_antofagasta
+    kind: solar
+    dataset: NSRDB GOES Full Disc PSM v4
+    year: 2023
+    latitude: -22.2812687
+    longitude: -69.5698745
+    filename: site_01_antofagasta_nsrdb_goes_full_disc_v4_2023.csv
+    url: https://github.com/FCR-CSET-Merlin/H2Integrate_CL/releases/download/chile-weather-2023-v1/site_01_antofagasta_nsrdb_goes_full_disc_v4_2023.csv
+    sha256: 48a12933ee97c3ed1f890275291846ec5e235208eac70c0650b6e1f7f743063c
+    size_bytes: 615304
+  - site: site_02_magallanes
+    kind: wind
+    dataset: Sup3rWind South America v1.0.0
+    year: 2023
+    latitude: -52.8502704
+    longitude: -70.9575804
+    filename: site_02_magallanes_sup3rwind_2023.csv
+    url: https://github.com/FCR-CSET-Merlin/H2Integrate_CL/releases/download/chile-weather-2023-v1/site_02_magallanes_sup3rwind_2023.csv
+    sha256: 43a6fd5876751bbc13fc4472d4085a89bd8eda80dc0400c167c26df10d7f1527
+    size_bytes: 1201922
+  - site: site_02_magallanes
+    kind: solar
+    dataset: NSRDB GOES Full Disc PSM v4
+    year: 2023
+    latitude: -52.8502704
+    longitude: -70.9575804
+    filename: site_02_magallanes_nsrdb_goes_full_disc_v4_2023.csv
+    url: https://github.com/FCR-CSET-Merlin/H2Integrate_CL/releases/download/chile-weather-2023-v1/site_02_magallanes_nsrdb_goes_full_disc_v4_2023.csv
+    sha256: 0e4613352cadf3f1a8bcabbec9f1fb18dd0135923395872e3488137c03fa6e0b
+    size_bytes: 611302

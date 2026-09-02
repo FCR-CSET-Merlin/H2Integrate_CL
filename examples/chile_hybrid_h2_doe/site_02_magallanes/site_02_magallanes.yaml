@@ -1,0 +1,5 @@
+name: chile_hybrid_h2_doe_site_02_magallanes
+system_summary: DOE solar-eólico-PEM aislado de red en Magallanes, Chile.
+driver_config: ../common/driver_config.yaml
+technology_config: ../common/tech_config.yaml
+plant_config: plant_config.yaml

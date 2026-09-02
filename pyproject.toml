@@ -112,9 +112,14 @@ gis = [
   "geopandas",
   "contextily"
 ]
+era5 = [
+  "h5netcdf",
+  "pvlib",
+  "xarray",
+]
 ard = ["ard-nrel"]
 extras = ["h2integrate[gis,ard]"]
-all = ["h2integrate[develop,extras,examples]"]
+all = ["h2integrate[develop,era5,extras,examples]"]
 
 [tool.setuptools]
 include-package-data = true

@@ -532,6 +532,56 @@ La integración ERA5 deberá incluir:
 - Integración con los modelos PySAM solar y eólico.
 - Comparación de control con otra fuente y, cuando sea posible, con observaciones chilenas.
 
+### 8.7. Plan de implementación acordado
+
+El contrato formal de entrada, procesamiento, validación y salida se encuentra en
+`docs/resource/era5_single_levels_contract.md`.
+
+La adaptación se desarrollará de forma incremental y mediante cambios pequeños y
+revisables. La primera entrega se limitará a lectura local de archivos NetCDF mensuales,
+resolución horaria, timestamps en UTC, selección espacial por vecino más cercano y un año
+meteorológico completo. La descarga remota, Zarr, OPeNDAP, interpolación bilineal y
+procesamiento masivo de sitios quedan fuera de este primer alcance.
+
+La secuencia de trabajo será:
+
+1. Formalizar el contrato de datos ERA5, incluyendo variables obligatorias, unidades,
+   convención temporal, elevación, tratamiento espacial y límites físicos.
+2. Incorporar `xarray`, `h5netcdf` y `pvlib` como dependencias opcionales, sin afectar a
+   quienes no utilicen ERA5.
+3. Implementar un lector común que descubra y concatene archivos mensuales, seleccione el
+   sitio y valide grilla, año, frecuencia, duplicados, datos faltantes y variables.
+4. Implementar las transformaciones eólicas desde componentes `u` y `v`, temperatura,
+   presión y geopotencial. Para bujes sobre 100 m se utilizará el dato de 100 m con una
+   advertencia, sin extrapolación implícita.
+5. Implementar las transformaciones solares de SSRD y FDIR a GHI, DHI y DNI, validando la
+   referencia de las acumulaciones y la geometría solar cerca del horizonte.
+6. Crear `ERA5SingleLevelsWindResource` y `ERA5SingleLevelsSolarResource`, conservar los
+   contratos `wind_resource_data` y `solar_resource_data`, y registrar ambos modelos sin
+   modificar las interfaces públicas existentes.
+7. Añadir fixtures NetCDF sintéticos y pruebas unitarias para lectura, tiempo, espacio,
+   unidades, conversiones, años bisiestos, errores de entrada y límites físicos.
+8. Ejecutar pruebas de integración con PySAM eólico y solar, además de un caso híbrido
+   mínimo, y comparar perfiles horarios, mensuales y anuales con fuentes independientes.
+9. Documentar configuración, supuestos, limitaciones y trazabilidad; evaluar optimizaciones
+   de caché o formatos remotos únicamente después de validar la primera implementación.
+
+Al 12 de agosto de 2026 se encuentran implementados los pasos 1 a 7 y la integración
+funcional principal del paso 8: contrato técnico, dependencias opcionales, lector común
+anual, transformaciones, componentes OpenMDAO, fixtures sintéticos y un caso híbrido
+configurado mediante YAML. Las salidas conservan los contratos `wind_resource_data` y
+`solar_resource_data` usados por PySAM. El caso integral conecta ambos recursos con
+tecnologías eólica y FV, y combina sus perfiles eléctricos horarios. El convertidor eólico
+advierte y utiliza 100 m, sin extrapolar, cuando el buje supera la altura máxima disponible
+en ERA5. Continúan pendientes las comparaciones con fuentes independientes indicadas en el
+paso 8 y las optimizaciones posteriores del paso 9.
+
+Los archivos ERA5-SL de prueba disponibles para 2023 tienen una grilla regular de 0,25°
+sobre Chile, 8.760 registros horarios continuos y variables eólicas, solares y auxiliares
+suficientes para iniciar la adaptación. Los puntos críticos que requieren validación antes
+de una aplicación productiva son la conversión de FDIR a DNI, la alineación temporal con
+PySAM, la topografía suavizada de ERA5 y la ausencia de viento sobre 100 m.
+
 ## 9. Tarea de adaptación 2: parámetros financieros de Chile
 
 ### 9.1. Objetivo
