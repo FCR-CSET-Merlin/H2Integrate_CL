@@ -538,3 +538,29 @@ descargados ni resultados voluminosos.
   una cuenta NLR y obtener los recursos exactamente validados para ambos casos.
 - **Estado:** Completado y publicado.
 - **Responsable:** Codex.
+
+## 2026-09-10 10:35:00 -03 — Reporte de resultados y benchmark de DOE híbrido Chile
+
+- **Resumen y propósito:** Se creó un reporte versionable de los principales resultados de los
+  casos híbridos de Antofagasta y Magallanes, y se evaluó literatura técnica para
+  contextualizar sus costos de producción de hidrógeno verde *off-grid*.
+- **Archivos modificados:** Se creó `reports/chile_hybrid_h2_doe_2023_results.md`, se añadió su
+  excepción a `.gitignore` y se actualizó este registro. Los CSV de resultados y
+  recursos meteorológicos se leyeron desde directorios ignorados por Git; no se modificaron
+  ni versionaron datos, resultados brutos o credenciales.
+- **Supuestos o decisiones:** El reporte presenta el mínimo LCOH sólo entre los diseños con al
+  menos 20 kt H₂/año y diferencia dicho indicador del mínimo no restringido. La comparación con
+  León et al. (2023), una tesis USM, IRENA e IEA se trata como benchmark de orden de magnitud,
+  no como validación numérica, por diferencias de escala, tecnología, año de costo y fronteras
+  del sistema. Se explicita que el DOE no incluye batería, H₂ almacenado, agua/desalación,
+  compresión, transporte ni ingresos por oxígeno.
+- **Verificación:** Se leyeron dos `doe_results.csv` de 72 filas cada uno. Antofagasta presentó
+  seis diseños factibles y mínimo LCOH de 7,18 USD/kg con 20,41 kt/año; Magallanes presentó 17
+  y mínimo factible de 6,08 USD/kg con 20,58 kt/año. Se revisaron las referencias enlazadas y
+  sus límites de sistema, y `git diff --check` no reportó errores.
+- **Resultado:** El repositorio dispone de un reporte reproducible que identifica Magallanes
+  como el menor LCOH factible en el DOE actual, explica el papel del factor de planta PEM y
+  establece una ruta para una validación comparativa más rigurosa.
+- **Estado:** Completado; pendiente, si se requiere mayor robustez, ejecutar sensibilidades y
+  ampliar el DOE cerca de las alternativas factibles de menor costo.
+- **Responsable:** Codex.

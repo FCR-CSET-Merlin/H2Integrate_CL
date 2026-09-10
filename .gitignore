@@ -145,6 +145,7 @@ docs/_autosummary
 output*
 snopt_history.txt
 reports/*
+!reports/chile_hybrid_h2_doe_2023_results.md
 
 # Don't ignore source data files
 !*source.xlsx
