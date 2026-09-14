@@ -102,6 +102,50 @@ Para una comparación más rigurosa se recomienda:
 4. Ampliar el DOE cerca de los diseños factibles de menor LCOH, especialmente
    alrededor de 100–250 MWdc FV, 180 MW eólicos y 150–250 MW PEM en Magallanes.
 
+## Reutilización en un *fork* para nuevos sitios
+
+Un tercero puede hacer *fork* de H2Integrate_CL y configurar casos propios con
+recursos locales de Sup3rWind y NSRDB. Los lectores están integrados en el
+código; no es necesario reimplementar la lectura del recurso. La selección del
+formato no es automática: se declara explícitamente en el YAML del caso.
+
+```yaml
+wind_resource:
+  resource_model: Sup3rWindResource
+  resource_parameters:
+    resource_dir: ruta/a/los/datos
+    resource_filename: mi_sitio_sup3rwind_2023.csv
+
+solar_resource:
+  resource_model: GOESFullDiscSolarAPI
+  resource_parameters:
+    resource_dir: ruta/a/los/datos
+    resource_filename: mi_sitio_nsrdb_2023.csv
+```
+
+Los CSV deben corresponder al formato de descarga de NLR, idealmente al mismo
+año y con resolución horaria. Los cuatro recursos públicos de esta Release sólo
+cubren Antofagasta y Magallanes. Para otra localidad, el usuario debe obtener
+los dos CSV correspondientes, por ejemplo con
+[`download_nlr_resources.py`](../h2integrate/tools/download_nlr_resources.py)
+y sus credenciales NLR, o desde una fuente compatible disponible localmente.
+
+Para instanciar un tercer sitio a partir de este ejemplo se requiere:
+
+1. Crear una configuración de sitio con sus coordenadas, archivos de recurso y
+   supuestos tecnológicos/financieros.
+2. Añadirlo al ejecutor o implementar un ejecutor propio que cargue su YAML.
+3. Si se reutiliza el flujo de descarga pública, extender el manifiesto con los
+   dos assets, sus tamaños y SHA-256; para acceso sin credenciales, publicar los
+   archivos en una Release.
+
+El ejecutor y manifiesto actuales están deliberadamente acotados a dos sitios y
+cuatro recursos. `run_case_study.py` enumera sólo Antofagasta y Magallanes, y
+la validación del manifiesto exige exactamente cuatro entradas. Esta restricción
+pertenece al ejemplo reproducible, no a los adaptadores Sup3rWind/NSRDB ni a
+H2Integrate; un flujo multi-sitio genérico requeriría generalizar esos dos
+componentes.
+
 ## Reproducción
 
 Los casos se ejecutan desde la raíz del repositorio:

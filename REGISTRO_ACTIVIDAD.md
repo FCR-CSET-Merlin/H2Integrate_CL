@@ -564,3 +564,23 @@ descargados ni resultados voluminosos.
 - **Estado:** Completado; pendiente, si se requiere mayor robustez, ejecutar sensibilidades y
   ampliar el DOE cerca de las alternativas factibles de menor costo.
 - **Responsable:** Codex.
+
+## 2026-09-14 12:00:39 -03 — Guía de reutilización de recursos en forks
+
+- **Resumen y propósito:** Se incorporó al reporte de resultados una guía para que usuarios de un
+  *fork* de H2Integrate_CL configuren nuevos sitios con recursos Sup3rWind y NSRDB locales.
+- **Archivos modificados:** Se actualizó `reports/chile_hybrid_h2_doe_2023_results.md` y este
+  registro. No se modificaron configuraciones, CSV meteorológicos, resultados de simulación ni
+  credenciales.
+- **Supuestos o decisiones:** La guía distingue los adaptadores de recurso reutilizables de las
+  restricciones deliberadas del ejemplo público. Se documenta que el modelo de recurso se elige
+  en YAML y que el ejecutor/manifiesto actuales están limitados a dos sitios y cuatro archivos;
+  un tercer sitio exige nueva configuración y, si usa el flujo público, ampliar manifiesto,
+  pruebas y Release.
+- **Verificación:** Se contrastaron las afirmaciones con `Sup3rWindResource`,
+  `GOESFullDiscSolarAPI`, `download_nlr_resources.py`, `run_case_study.py` y la validación del
+  manifiesto. Se comprobaron los enlaces relativos del reporte y `git diff --check`.
+- **Resultado:** El reporte explica los requisitos, límites y pasos de reutilización sin sugerir
+  que el descubrimiento de archivos o sitios sea automático.
+- **Estado:** Completado.
+- **Responsable:** Codex.
